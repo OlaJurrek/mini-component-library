@@ -7,57 +7,68 @@ import VisuallyHidden from "../VisuallyHidden";
 
 const ProgressBar = ({ value, size }) => {
   const styles = SIZES[size];
+
+  if (!styles) {
+    throw new Error(`Unknown size passed to ProgressBar: ${size}`);
+  }
+
   return (
-    <Wrapper style={styles}>
-      <Bar
-        role="progressbar"
-        aria-valuenow={value}
-        aria-valuemin="0"
-        aria-valuemax="100"
-        value={value}
-        style={{ "--width": value + "%" }}
-      >
-        <VisuallyHidden>{value} %</VisuallyHidden>
-      </Bar>
+    <Wrapper
+      style={{
+        "--padding": styles.padding + "px",
+        "--borderRadius": styles.borderRadius + "px",
+      }}
+    >
+      <VisuallyHidden>{value} %</VisuallyHidden>
+      <BarWrapper>
+        <Bar
+          role="progressbar"
+          aria-valuenow={value}
+          aria-valuemin="0"
+          aria-valuemax="100"
+          style={{ "--width": value + "%", "--height": styles.height + "px" }}
+        ></Bar>
+      </BarWrapper>
     </Wrapper>
   );
 };
 
 const SIZES = {
   small: {
-    "--height": 8 + "px",
-    "--borderRadius": 4 + "px",
-    "--padding": 0,
+    height: 8,
+    borderRadius: 4,
+    padding: 0,
   },
   medium: {
-    "--height": 12 + "px",
-    "--borderRadius": 4 + "px",
-    "--padding": 0,
+    height: 12,
+    borderRadius: 4,
+    padding: 0,
   },
   large: {
-    "--height": 16 + "px",
-    "--borderRadius": 8 + "px",
-    "--padding": 4 + "px",
+    height: 16,
+    borderRadius: 8,
+    padding: 4,
   },
 };
 
 const Wrapper = styled.div`
-  width: 370px;
-  height: var(--height);
   padding: var(--padding);
   border-radius: var(--borderRadius);
   box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
   background-color: ${COLORS.transparentGray15};
 `;
 
+const BarWrapper = styled.div`
+  border-radius: 4px;
+  /* Trim off corners when progress bar is near-full. */
+  overflow: hidden;
+`;
+
 const Bar = styled.div`
   width: var(--width);
-  height: 100%;
+  height: var(--height);
   background-color: ${COLORS.primary};
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: ${(p) => (p.value < 98 ? 0 : "4px")};
-  border-bottom-right-radius: ${(p) => (p.value < 98 ? 0 : "4px")};
+  border-radius: 4px 0 0 4px;
 `;
 
 export default ProgressBar;
